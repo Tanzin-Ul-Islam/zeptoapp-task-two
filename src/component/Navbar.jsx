@@ -1,13 +1,15 @@
 import React, { useState } from "react";
-import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
+import { AiOutlineClose, AiOutlineHeart, AiOutlineMenu } from "react-icons/ai";
 import { Link, useLocation } from "react-router-dom";
-import { motion } from "motion/react"
+import { motion } from "motion/react";
+import useWishlist from "../hook/useWishlist";
 const navLinks = [
   { title: "Home", path: "/" },
   { title: "Wishlist", path: "/wishlist" },
 ];
 
 export default function Navbar() {
+  const { wishlistCounter } = useWishlist();
   const [nav, setNav] = useState(false);
   const location = useLocation();
   const toggleNav = () => setNav(!nav);
@@ -28,8 +30,16 @@ export default function Navbar() {
             {navLinks.map((el, index) => (
               <li key={index}>
                 <Link to={el.path} className="group">
-                  <h1 className="text-md font-bold text-white/70 cursor-pointer">
+                  <h1 className="text-md font-bold text-white/70 cursor-pointer flex items-center gap-2">
                     {el.title}
+                    {el.title === "Wishlist" && (
+                      <span className="relative">
+                        <AiOutlineHeart size={24} />
+                        <span className="absolute -top-1 -right-2 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                          {wishlistCounter}
+                        </span>
+                      </span>
+                    )}
                   </h1>
                   {location.pathname === el.path && (
                     <div className="relative">
@@ -45,7 +55,12 @@ export default function Navbar() {
 
         {/* Mobile Navbar Header */}
         <div className="md:hidden flex items-center justify-between px-4 py-6">
-          <div className="w-8" /> {/* Spacer */}
+          <Link to="/wishlist" className="text-white/70 relative">
+            <AiOutlineHeart size={24} />
+            <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+              {wishlistCounter}
+            </span>
+          </Link>
           <button
             onClick={toggleNav}
             className="border border-white/70 text-white/70 rounded p-2 z-50"

@@ -1,81 +1,103 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import BookCard from "../component/BookCard";
-export default function Home() {
-  const books = [
-    {
-      id: 1,
-      title: "The Great Gatsby",
-      author: "F. Scott Fitzgerald",
-      coverImage:
-        "https://m.media-amazon.com/images/I/71FTb9X6wsL._AC_UF1000,1000_QL80_.jpg",
-      rating: 4.2,
-    },
-    {
-      id: 2,
-      title: "To Kill a Mockingbird",
-      author: "Harper Lee",
-      coverImage:
-        "https://m.media-amazon.com/images/I/71FxgtFKcQL._AC_UF1000,1000_QL80_.jpg",
-      rating: 4.3,
-    },
-    {
-      id: 3,
-      title: "1984",
-      author: "George Orwell",
-      coverImage:
-        "https://m.media-amazon.com/images/I/61ZewDE3beL._AC_UF1000,1000_QL80_.jpg",
-      rating: 4.2,
-    },
-    {
-      id: 4,
-      title: "Pride and Prejudice",
-      author: "Jane Austen",
-      coverImage:
-        "https://m.media-amazon.com/images/I/71Q1tPupKjL._AC_UF1000,1000_QL80_.jpg",
-      rating: 4.3,
-    },
-    {
-      id: 5,
-      title: "The Hobbit",
-      author: "J.R.R. Tolkien",
-      coverImage:
-        "https://m.media-amazon.com/images/I/710+HcoP38L._AC_UF1000,1000_QL80_.jpg",
-      rating: 4.7,
-    },
-    {
-      id: 6,
-      title: "The Catcher in the Rye",
-      author: "J.D. Salinger",
-      coverImage:
-        "https://m.media-amazon.com/images/I/91HPG31dTwL._AC_UF1000,1000_QL80_.jpg",
-      rating: 3.8,
-    },
-    {
-      id: 7,
-      title: "The Lord of the Rings",
-      author: "J.R.R. Tolkien",
-      coverImage:
-        "https://m.media-amazon.com/images/I/51EstVXM1UL._AC_UF1000,1000_QL80_.jpg",
-      rating: 4.5,
-    },
-    {
-      id: 8,
-      title: "Animal Farm",
-      author: "George Orwell",
-      coverImage:
-        "https://m.media-amazon.com/images/I/91LUbAcpACL._AC_UF1000,1000_QL80_.jpg",
-      rating: 4.2,
-    },
-  ];
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Popular Books</h2>
+import useBook from "../hook/useBook";
+import BookListSkeleton from "../component/skeleton/BookListSkeleton";
+import Pagination from "../component/Pagination";
+import useDebounce from "../hook/useDebounce";
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        {books.map((book) => (
-          <BookCard book={book} />
-        ))}
+import SearchFilter from "../component/SearchFilter";
+import Constants from "../constants";
+import usePaginate from "../hook/usePaginate";
+export default function HomePage() {
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 700);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [selectedTopic, setSelectedTopic] = useState("");
+  const [searchTopic, setSearchTopic] = useState("");
+  const { topicList, useBookQuery, getBookTopics } = useBook();
+  const {
+    currentSelectedPage,
+    setCurrentSelectedPage,
+    handleBookPagination,
+    getTotalPages,
+  } = usePaginate();
+  const { data, isLoading, isError } = useBookQuery(
+    {
+      search: debouncedSearch,
+      topic: selectedTopic,
+      page: currentSelectedPage,
+    },
+    {
+      enabled: !!(debouncedSearch || selectedTopic), // Only run when filters are set
+    }
+  );
+
+  const { count, results: books = [] } = data || {};
+
+  useEffect(() => {
+    if (books?.length > 0 && !topicList.length) getBookTopics(books);
+  }, [books]);
+
+  useEffect(() => {
+    setCurrentSelectedPage(1);
+  }, [debouncedSearch, selectedTopic]);
+
+  // Handle error state
+  if (isError) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center text-red-600">
+          <h2 className="text-2xl font-bold mb-4">Something went wrong</h2>
+          <p>Failed to fetch books. Please try reload the page.</p>
+          <button
+            className="bg-blue-500 text-white px-4 py-1 rounded-md mt-2"
+            onClick={() => window.location.reload()}
+          >
+            Reload
+          </button>
+        </div>
       </div>
-    </div>
+    );
+  }
+
+  return (
+    <>
+      {!isLoading ? (
+        <div className="container mx-auto px-4 py-8">
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">
+            Popular Books
+          </h2>
+          <SearchFilter
+            search={search}
+            setSearch={setSearch}
+            isDropdownOpen={isDropdownOpen}
+            setIsDropdownOpen={setIsDropdownOpen}
+            selectedTopic={selectedTopic}
+            setSelectedTopic={setSelectedTopic}
+            searchTopic={searchTopic}
+            setSearchTopic={setSearchTopic}
+            topicList={topicList}
+          />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {books?.map((book, index) => (
+              <BookCard key={index} book={book} />
+            ))}
+          </div>
+          {books?.length > 0 && (
+            <Pagination
+              totalPages={getTotalPages(count, Constants.HOME_LIMIT)}
+              currentSelectedPage={currentSelectedPage}
+              handleBookPagination={handleBookPagination}
+            />
+          )}
+        </div>
+      ) : (
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <BookListSkeleton />
+          </div>
+        </div>
+      )}
+    </>
   );
 }
