@@ -11,7 +11,12 @@ export default function SearchFilter({
   searchTopic,
   setSearchTopic,
   topicList,
+  setCurrentSelectedPage,
 }) {
+  const handleSearch = (value = "") => {
+    setSearch(value);
+    setCurrentSelectedPage(1);
+  };
   return (
     <div className="flex flex-col md:flex-row gap-4 mb-6">
       {/* Search Bar */}
@@ -21,11 +26,13 @@ export default function SearchFilter({
           placeholder="Search books..."
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            handleSearch(e.target.value);
+          }}
         />
         {search && (
           <button
-            onClick={() => setSearch("")}
+            onClick={() => handleSearch()}
             className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
             aria-label="Clear search"
           >
@@ -89,6 +96,7 @@ export default function SearchFilter({
                         setSelectedTopic(topic);
                         setSearchTopic("");
                         setIsDropdownOpen(false);
+                        setCurrentSelectedPage(1);
                       }}
                     >
                       {topic}

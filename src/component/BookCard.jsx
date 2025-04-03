@@ -1,10 +1,15 @@
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 import useBook from "../hook/useBook";
 import useWishlist from "../hook/useWishlist";
+import { useState } from "react";
+
 const BookCard = ({ book }) => {
   const { getAuthorName } = useBook();
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
-
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const handleImageLoad = () => {
+    setIsImageLoaded(true);
+  };
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 relative">
       {isInWishlist(book) ? (
@@ -27,14 +32,24 @@ const BookCard = ({ book }) => {
 
       {/* Book Cover Image */}
       <div className="h-48 md:h-56 overflow-hidden">
-        <img
-          src={book?.formats["image/jpeg"] || ""}
-          alt={book.title}
+      <img
+          src="/blur.jpg"
+          alt="Blurred Image"
           className="w-full h-full object-cover"
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src =
-              "https://via.placeholder.com/300x400?text=Book+Cover";
+          style={{
+            filter: "blur(15px)",
+            transition: "opacity 0.5s ease",
+            opacity: isImageLoaded ? 0 : 1,
+          }}
+        />
+        <img
+          src={book?.formats["image/jpeg"]}
+          alt={book.title}
+          className="w-full h-[224px] object-cover absolute top-0 left-0"
+          onLoad={handleImageLoad}
+          style={{
+            opacity: isImageLoaded ? 1 : 0, // Fixed this line (was 0:0)
+            transition: "opacity 0.5s ease",
           }}
         />
       </div>

@@ -21,6 +21,7 @@ export default function HomePage() {
     handleBookPagination,
     getTotalPages,
   } = usePaginate();
+
   const { data, isLoading, isError } = useBookQuery(
     {
       search: debouncedSearch,
@@ -28,7 +29,7 @@ export default function HomePage() {
       page: currentSelectedPage,
     },
     {
-      enabled: !!(debouncedSearch || selectedTopic), // Only run when filters are set
+      enabled: !!(debouncedSearch || selectedTopic),
     }
   );
 
@@ -38,11 +39,6 @@ export default function HomePage() {
     if (books?.length > 0 && !topicList.length) getBookTopics(books);
   }, [books]);
 
-  useEffect(() => {
-    setCurrentSelectedPage(1);
-  }, [debouncedSearch, selectedTopic]);
-
-  // Handle error state
   if (isError) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -61,28 +57,39 @@ export default function HomePage() {
   }
 
   return (
-    <>
+    <div className="container mx-auto px-4 py-8">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">Popular Books</h2>
+      <SearchFilter
+        search={search}
+        setSearch={setSearch}
+        isDropdownOpen={isDropdownOpen}
+        setIsDropdownOpen={setIsDropdownOpen}
+        selectedTopic={selectedTopic}
+        setSelectedTopic={setSelectedTopic}
+        searchTopic={searchTopic}
+        setSearchTopic={setSearchTopic}
+        topicList={topicList}
+        setCurrentSelectedPage={setCurrentSelectedPage}
+      />
       {!isLoading ? (
-        <div className="container mx-auto px-4 py-8">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">
-            Popular Books
-          </h2>
-          <SearchFilter
-            search={search}
-            setSearch={setSearch}
-            isDropdownOpen={isDropdownOpen}
-            setIsDropdownOpen={setIsDropdownOpen}
-            selectedTopic={selectedTopic}
-            setSelectedTopic={setSelectedTopic}
-            searchTopic={searchTopic}
-            setSearchTopic={setSearchTopic}
-            topicList={topicList}
-          />
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {books?.map((book, index) => (
-              <BookCard key={index} book={book} />
-            ))}
-          </div>
+        <>
+          {books?.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {books?.map((book, index) => (
+                <BookCard key={index} book={book} />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12">
+              <img
+                src="/book.jpg"
+                alt="No Books Found"
+                className="w-48 h-48 mb-4"
+              />
+              <p className="text-xl font-bold text-gray-600">No books found</p>
+            </div>
+          )}
+
           {books?.length > 0 && (
             <Pagination
               totalPages={getTotalPages(count, Constants.HOME_LIMIT)}
@@ -90,14 +97,10 @@ export default function HomePage() {
               handleBookPagination={handleBookPagination}
             />
           )}
-        </div>
+        </>
       ) : (
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <BookListSkeleton />
-          </div>
-        </div>
+        <BookListSkeleton />
       )}
-    </>
+    </div>
   );
 }
