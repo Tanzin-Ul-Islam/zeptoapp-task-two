@@ -1,11 +1,9 @@
 import { useState } from "react";
 import Constants from "../constants";
-import useWishlist from "./useWishlist";
 const usePaginate = () => {
   const [currentSelectedPage, setCurrentSelectedPage] = useState(1);
   const [startIndex, setStartIndex] = useState(0);
   const [endIndex, setEndIndex] = useState(0);
-  const { wishlist } = useWishlist();
 
   const getTotalPages = (count, limit) => {
     return Math.ceil(count / limit);
@@ -16,8 +14,8 @@ const usePaginate = () => {
     setCurrentSelectedPage(selected + 1);
   };
 
-  const getStartAndEndIndex = () => {
-    const totalPage = getTotalPages(wishlist.length, Constants.WISHLIST_LIMIT);
+  const getStartAndEndIndex = (count, limit) => {
+    const totalPage = getTotalPages(count, limit);
     if (currentSelectedPage > totalPage) {
       setCurrentSelectedPage(totalPage);
       return;

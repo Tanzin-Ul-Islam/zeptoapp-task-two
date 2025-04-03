@@ -19,16 +19,14 @@ export default function WishlistPage() {
   } = usePaginate();
 
   useEffect(() => {
-    console.log("in use effect");
     if (wishlist?.length !== previousWishlistLength) {
-      getStartAndEndIndex();
+      getStartAndEndIndex(wishlist?.length, Constants.WISHLIST_LIMIT);
       setPreviousWishlistLength(wishlist?.length);
     }
   }, [wishlist]);
 
   useDidMountEffect(() => {
-    console.log("in did mount effect");
-    getStartAndEndIndex();
+    getStartAndEndIndex(wishlist?.length, Constants.WISHLIST_LIMIT);
   }, [currentSelectedPage]);
 
   return (
