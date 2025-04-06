@@ -5,7 +5,6 @@ export async function getData({ url }) {
 
   const response = await fetch(url, {
     headers,
-    cache: "no-cache",
     method: "GET",
   });
 

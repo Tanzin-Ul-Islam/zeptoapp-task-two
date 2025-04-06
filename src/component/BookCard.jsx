@@ -2,6 +2,7 @@ import { FaRegHeart, FaHeart } from "react-icons/fa";
 import useBook from "../hook/useBook";
 import useWishlist from "../hook/useWishlist";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const BookCard = ({ book }) => {
   const { getAuthorName } = useBook();
@@ -34,7 +35,10 @@ const BookCard = ({ book }) => {
       </div>
 
       {/* Book Cover Image */}
-      <div className="h-48 md:h-56 overflow-hidden relative flex items-center justify-center bg-gray-100">
+      <Link
+        to={`/book/${book?.id}`}
+        className="h-48 md:h-56 overflow-hidden relative flex items-center justify-center bg-gray-100"
+      >
         <img
           src="/blur.jpg"
           alt="Blurred Image"
@@ -55,13 +59,15 @@ const BookCard = ({ book }) => {
             transition: "opacity 0.5s ease",
           }}
         />
-      </div>
+      </Link>
 
       {/* Book Details */}
       <div className="p-4">
-        <h3 className="text-lg font-semibold text-gray-800 mb-1 line-clamp-1">
-          {book?.title}
-        </h3>
+        <Link to={`/book/${book?.id}`}>
+          <h3 className="text-lg font-semibold text-gray-800 mb-1 line-clamp-1">
+            {book?.title}
+          </h3>
+        </Link>
         {book?.authors?.length > 0 && (
           <p className="text-gray-600 text-sm font-medium mb-2">
             by {getAuthorName(book?.authors)}

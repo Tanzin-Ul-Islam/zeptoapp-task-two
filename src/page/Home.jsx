@@ -8,7 +8,16 @@ import useDebounce from "../hook/useDebounce";
 import SearchFilter from "../component/SearchFilter";
 import Constants from "../constants";
 import usePaginate from "../hook/usePaginate";
+import { useLocation, useSearchParams } from "react-router-dom";
 export default function HomePage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Get individual parameter
+  const id = searchParams.get("id");
+  const page = searchParams.get("page");
+  console.log("id", id, "page", page);
+  const location = useLocation();
+  console.log(location.pathname); // "/products/123"
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 700);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
