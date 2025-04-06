@@ -17,6 +17,12 @@ export default function SearchFilter({
     setSearch(value);
     setCurrentSelectedPage(1);
   };
+  const handleTopicChange = (value = "") => {
+    setSelectedTopic(value);
+    setSearchTopic("");
+    setIsDropdownOpen(false);
+    setCurrentSelectedPage(1);
+  };
   return (
     <div className="flex flex-col md:flex-row gap-4 mb-6">
       {/* Search Bar */}
@@ -49,9 +55,8 @@ export default function SearchFilter({
           >
             {selectedTopic || "Filter by topic"}
             <svg
-              className={`w-5 h-5 ml-2 transition-transform ${
-                isDropdownOpen ? "rotate-180" : ""
-              }`}
+              className={`w-5 h-5 ml-2 transition-transform ${isDropdownOpen ? "rotate-180" : ""
+                }`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -87,16 +92,12 @@ export default function SearchFilter({
                   .map((topic) => (
                     <div
                       key={topic}
-                      className={`px-4 py-2 hover:bg-gray-100 cursor-pointer ${
-                        selectedTopic === topic
-                          ? "bg-blue-50 text-blue-600"
-                          : ""
-                      }`}
+                      className={`px-4 py-2 hover:bg-gray-100 cursor-pointer ${selectedTopic === topic
+                        ? "bg-blue-50 text-blue-600"
+                        : ""
+                        }`}
                       onClick={() => {
-                        setSelectedTopic(topic);
-                        setSearchTopic("");
-                        setIsDropdownOpen(false);
-                        setCurrentSelectedPage(1);
+                        handleTopicChange(topic)
                       }}
                     >
                       {topic}

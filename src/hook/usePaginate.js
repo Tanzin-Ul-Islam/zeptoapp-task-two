@@ -1,7 +1,9 @@
 import { useState } from "react";
 import Constants from "../constants";
+import { useSearchParams } from "react-router-dom";
 const usePaginate = () => {
-  const [currentSelectedPage, setCurrentSelectedPage] = useState(1);
+  const [searchParams] = useSearchParams();
+  const [currentSelectedPage, setCurrentSelectedPage] = useState(searchParams.get('page') || 1);
   const [startIndex, setStartIndex] = useState(0);
   const [endIndex, setEndIndex] = useState(0);
 

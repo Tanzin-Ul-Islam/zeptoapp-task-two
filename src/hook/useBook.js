@@ -2,7 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { getData } from "../api/api-core";
 import api from "../api/api.json";
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 const useBook = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [topicList, setTopicList] = useState([]);
   const fetchBooks = async ({ queryKey }) => {
     const [_key, { search, topic, page }] = queryKey;
@@ -16,13 +18,28 @@ const useBook = () => {
     const url = `${api.bookUrl}/${bookId}`;
     return await getData({ url });
   };
-  const useBookQuery = ({ search, topic, page }) =>
-    useQuery({
+
+
+  const updateParams = ({ search, topic, page }) => {
+    const newParams = new URLSearchParams();
+    if (search) newParams.set('search', search);
+    if (topic) newParams.set('topic', topic);
+    if (page > 1) newParams.set('page', page.toString());
+    setSearchParams(newParams);
+  };
+
+  const useBookQuery = () => {
+    const search = searchParams.get('search') || '';
+    const topic = searchParams.get('topic') || '';
+    const page = Number(searchParams.get('page')) || 1;
+    return useQuery({
       queryKey: ["book", { search, topic, page }],
       queryFn: fetchBooks,
       keepPreviousData: true,
     });
-  const useBookDetailsQuery  = ({ bookId }) =>
+  }
+
+  const useBookDetailsQuery = ({ bookId }) =>
     useQuery({
       queryKey: ['bookDetails', { bookId }],
       queryFn: fetchBookDetails,
@@ -55,6 +72,7 @@ const useBook = () => {
     fetchBookDetails,
     useBookQuery,
     useBookDetailsQuery,
+    updateParams,
     getBookTopics,
     getAuthorName,
     getSummaries,

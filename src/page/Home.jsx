@@ -8,22 +8,16 @@ import useDebounce from "../hook/useDebounce";
 import SearchFilter from "../component/SearchFilter";
 import Constants from "../constants";
 import usePaginate from "../hook/usePaginate";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import useDidMountEffect from "../hook/useDidMountEffect";
 export default function HomePage() {
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  // Get individual parameter
-  const id = searchParams.get("id");
-  const page = searchParams.get("page");
-  console.log("id", id, "page", page);
-  const location = useLocation();
-  console.log(location.pathname); // "/products/123"
-  const [search, setSearch] = useState("");
+  const [searchParams] = useSearchParams();
+  const [search, setSearch] = useState(searchParams.get('search') || "");
   const debouncedSearch = useDebounce(search, 700);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedTopic, setSelectedTopic] = useState("");
+  const [selectedTopic, setSelectedTopic] = useState(searchParams.get('topic') || "");
   const [searchTopic, setSearchTopic] = useState("");
-  const { topicList, useBookQuery, getBookTopics } = useBook();
+  const { topicList, useBookQuery, getBookTopics, updateParams } = useBook();
   const {
     currentSelectedPage,
     setCurrentSelectedPage,
@@ -33,20 +27,33 @@ export default function HomePage() {
 
   const { data, isLoading, isError } = useBookQuery(
     {
-      search: debouncedSearch,
-      topic: selectedTopic,
-      page: currentSelectedPage,
-    },
-    {
       enabled: !!(debouncedSearch || selectedTopic),
     }
   );
+  // const { data, isLoading, isError } = useBookQuery(
+  //   {
+  //     search: debouncedSearch,
+  //     topic: selectedTopic,
+  //     page: currentSelectedPage,
+  //   },
+  //   {
+  //     enabled: !!(debouncedSearch || selectedTopic),
+  //   }
+  // );
 
   const { count, results: books = [] } = data || {};
 
   useEffect(() => {
     if (books?.length > 0 && !topicList.length) getBookTopics(books);
   }, [books]);
+
+  useDidMountEffect(() => {
+    updateParams({
+      search: debouncedSearch,
+      topic: selectedTopic,
+      page: currentSelectedPage
+    });
+  }, [debouncedSearch, selectedTopic, currentSelectedPage]);
 
   if (isError) {
     return (
