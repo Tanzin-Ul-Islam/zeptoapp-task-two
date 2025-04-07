@@ -4,7 +4,6 @@ import useBook from "../hook/useBook";
 import BookListSkeleton from "../component/skeleton/BookListSkeleton";
 import Pagination from "../component/Pagination";
 import useDebounce from "../hook/useDebounce";
-
 import SearchFilter from "../component/SearchFilter";
 import Constants from "../constants";
 import usePaginate from "../hook/usePaginate";
@@ -12,10 +11,12 @@ import { useSearchParams } from "react-router-dom";
 import useDidMountEffect from "../hook/useDidMountEffect";
 export default function HomePage() {
   const [searchParams] = useSearchParams();
-  const [search, setSearch] = useState(searchParams.get('search') || "");
+  const [search, setSearch] = useState(searchParams.get("search") || "");
   const debouncedSearch = useDebounce(search, 700);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedTopic, setSelectedTopic] = useState(searchParams.get('topic') || "");
+  const [selectedTopic, setSelectedTopic] = useState(
+    searchParams.get("topic") || ""
+  );
   const [searchTopic, setSearchTopic] = useState("");
   const { topicList, useBookQuery, getBookTopics, updateParams } = useBook();
   const {
@@ -25,21 +26,9 @@ export default function HomePage() {
     getTotalPages,
   } = usePaginate();
 
-  const { data, isLoading, isError } = useBookQuery(
-    {
-      enabled: !!(debouncedSearch || selectedTopic),
-    }
-  );
-  // const { data, isLoading, isError } = useBookQuery(
-  //   {
-  //     search: debouncedSearch,
-  //     topic: selectedTopic,
-  //     page: currentSelectedPage,
-  //   },
-  //   {
-  //     enabled: !!(debouncedSearch || selectedTopic),
-  //   }
-  // );
+  const { data, isLoading, isError } = useBookQuery({
+    enabled: !!(debouncedSearch || selectedTopic),
+  });
 
   const { count, results: books = [] } = data || {};
 
@@ -51,7 +40,7 @@ export default function HomePage() {
     updateParams({
       search: debouncedSearch,
       topic: selectedTopic,
-      page: currentSelectedPage
+      page: currentSelectedPage,
     });
   }, [debouncedSearch, selectedTopic, currentSelectedPage]);
 

@@ -1,5 +1,5 @@
 import { FaArrowLeft, FaDownload, FaHeart, FaRegHeart } from "react-icons/fa";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import useBook from "../hook/useBook";
 import BookDetailsSkeleton from "../component/skeleton/BookDetailsSkeleton";
 import { useState } from "react";
@@ -7,6 +7,7 @@ import useWishlist from "../hook/useWishlist";
 
 const BookDetials = () => {
   let { bookId } = useParams();
+  const navigate = useNavigate();
   const { getAuthorName } = useBook();
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const { useBookDetailsQuery, getSummaries } = useBook();
@@ -46,9 +47,12 @@ const BookDetials = () => {
           {/* Header */}
           <header className="bg-white shadow-sm">
             <div className="container mx-auto px-4 py-4 flex items-center">
-              <Link to="/" className="mr-4 p-2 rounded-full hover:bg-gray-100">
+              <button
+                onClick={() => navigate(-1)}
+                className="mr-4 p-2 rounded-full hover:bg-gray-100"
+              >
                 <FaArrowLeft className="h-5 w-5 text-gray-600" />
-              </Link>
+              </button>
               <h1 className="text-xl font-semibold text-gray-800">
                 Book Details
               </h1>
@@ -110,7 +114,7 @@ const BookDetials = () => {
                           aria-label="Remove from wishlist"
                         >
                           <FaHeart className="text-blue-500 text-xl" />
-                          <span>Remove from Wishlist</span>
+                          <span className="text-sm md:text-base">Remove from Wishlist</span>
                         </button>
                       ) : (
                         <button
@@ -119,7 +123,7 @@ const BookDetials = () => {
                           aria-label="Add to wishlist"
                         >
                           <FaRegHeart className="text-gray-600 hover:text-blue-500 text-xl" />
-                          <span>Add to Wishlist</span>
+                          <span className="text-sm md:text-base">Add to Wishlist</span>
                         </button>
                       )}
                     </div>
@@ -131,15 +135,35 @@ const BookDetials = () => {
                     </div>
                   </div>
 
+                  {/* Topics */}
+                  {book?.subjects?.length > 0 && (
+                    <div className="mt-4">
+                      <h2 className="text-lg font-semibold text-gray-900 mb-2">Related Topics</h2>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-32 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                        {book?.subjects?.slice(0, 12).map((topic, index) => (
+                          <Link
+                            to={`/?topic=${encodeURIComponent(topic)}`}
+                            key={index}
+                            className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-sm truncate hover:bg-blue-100 transition-colors duration-200"
+                          >
+                            {topic}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Description */}
-                  <div className="mt-8">
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      Description
-                    </h2>
-                    <p className="mt-2 text-gray-700 leading-relaxed">
-                      {getSummaries(book.summaries)}
-                    </p>
-                  </div>
+                  {book?.summaries?.length > 0 && (
+                    <div className="mt-8">
+                      <h2 className="text-xl font-semibold text-gray-900">
+                        Description
+                      </h2>
+                      <p className="mt-2 text-gray-700 leading-relaxed">
+                        {getSummaries(book.summaries)}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

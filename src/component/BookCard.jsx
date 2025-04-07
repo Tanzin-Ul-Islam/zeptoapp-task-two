@@ -12,7 +12,7 @@ const BookCard = ({ book }) => {
     setIsImageLoaded(true);
   };
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 relative">
+    <div className="bg-blue-50 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 relative">
       {/* Wishlist Button - Moved outside the overflow-hidden container */}
       <div className="absolute top-2 right-2 z-10">
         {isInWishlist(book) ? (
@@ -37,7 +37,7 @@ const BookCard = ({ book }) => {
       {/* Book Cover Image */}
       <Link
         to={`/book/${book?.id}`}
-        className="h-48 md:h-56 overflow-hidden relative flex items-center justify-center bg-gray-100"
+        className="h-48 md:h-56 overflow-hidden relative flex items-center justify-center bg-blue-100"
       >
         <img
           src="/blur.jpg"
