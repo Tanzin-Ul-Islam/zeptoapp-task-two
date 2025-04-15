@@ -6,6 +6,7 @@ import { useSearchParams } from "react-router-dom";
 const useBook = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [topicList, setTopicList] = useState([]);
+
   const fetchBooks = async ({ queryKey }) => {
     const [_key, { search, topic, page }] = queryKey;
     let url = `${api.bookUrl}?page=${page}`;
@@ -13,6 +14,11 @@ const useBook = () => {
     if (topic) url += `&topic=${topic}`;
     return await getData({ url });
   };
+  const fetchAllBooks = async () => {
+    let url = `${api.bookUrl}`;
+    return await getData({ url });
+  };
+
   const fetchBookDetails = async ({ queryKey }) => {
     const [_key, { bookId }] = queryKey;
     const url = `${api.bookUrl}/${bookId}`;
@@ -35,6 +41,13 @@ const useBook = () => {
     return useQuery({
       queryKey: ["book", { search, topic, page }],
       queryFn: fetchBooks,
+      keepPreviousData: true,
+    });
+  }
+  const useAllBookQuery = () => {
+    return useQuery({
+      queryKey: ["book_all"],
+      queryFn: fetchAllBooks,
       keepPreviousData: true,
     });
   }
@@ -71,6 +84,7 @@ const useBook = () => {
     fetchBooks,
     fetchBookDetails,
     useBookQuery,
+    useAllBookQuery,
     useBookDetailsQuery,
     updateParams,
     getBookTopics,

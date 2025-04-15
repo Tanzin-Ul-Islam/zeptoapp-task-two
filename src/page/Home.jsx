@@ -18,7 +18,13 @@ export default function HomePage() {
     searchParams.get("topic") || ""
   );
   const [searchTopic, setSearchTopic] = useState("");
-  const { topicList, useBookQuery, getBookTopics, updateParams } = useBook();
+  const {
+    topicList,
+    useBookQuery,
+    useAllBookQuery,
+    getBookTopics,
+    updateParams,
+  } = useBook();
   const {
     currentSelectedPage,
     setCurrentSelectedPage,
@@ -29,12 +35,14 @@ export default function HomePage() {
   const { data, isLoading, isError } = useBookQuery({
     enabled: !!(debouncedSearch || selectedTopic),
   });
-
   const { count, results: books = [] } = data || {};
 
+  const { data: allBooksData } = useAllBookQuery();
+  const { results: allBooks = [] } = allBooksData || {};
+
   useEffect(() => {
-    if (books?.length > 0 && !topicList.length) getBookTopics(books);
-  }, [books]);
+    if (allBooks?.length > 0 && !topicList.length) getBookTopics(allBooks);
+  }, [allBooks]);
 
   useDidMountEffect(() => {
     updateParams({
